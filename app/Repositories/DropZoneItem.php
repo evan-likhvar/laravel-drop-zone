@@ -9,11 +9,14 @@
 namespace App\Repositories;
 
 
+use Illuminate\Support\Facades\Storage;
+use SplFileInfo;
+
 class DropZoneItem
 {
     private $absolutePathToStorage;                 // path to Laravel's storage directory
     private $relativePathToStorageDropZone;         // path to DropZone's directory into Laravel's storage directory
-    private $dropZoneHomeDirectory;
+    private $dropZoneHomeDirectory;                 // directory name into Laravel's storage where dropzone files in
     private $itemIndex;                             // items directory into DropZone's directory
     private $itemOriginalPath = '/original';        // directory for original downloaded files
     private $dropZoneThumbNail = '/preview';        // directory for dropzone preview
@@ -28,7 +31,25 @@ class DropZoneItem
         $this->fileName = $fileName;
     }
 
-    public function getFullPathToOriginalFile()
+    public function getPreviewInfo(): array
+    {
+
+        if (count($file = Storage::files($this->getRelativePathToDropZonePreviewFilesDirectory())) != 1)
+            throw new \Exception('Can\'t locate preview file' );
+
+        $fileInfo = new SplFileInfo($this->absolutePathToStorage.'/app/'.$file[0]);
+
+        if (empty($fileInfo))
+            throw new \Exception('Can\'t read preview file' );
+
+        return [
+            'link'=>'/'.$file[0],
+            'name'=>$fileInfo->getFilename(),
+            'size'=>$fileInfo->getSize()
+        ];
+    }
+
+    public function getFullPathToOriginalFile(): string
     {
         return
             $this->absolutePathToStorage
@@ -40,7 +61,7 @@ class DropZoneItem
             . $this->fileName;
     }
 
-    public function getFullPathToDropZonePreviewFile()
+    public function getFullPathToDropZonePreviewFile(): string
     {
         return
             $this->absolutePathToStorage
@@ -59,7 +80,7 @@ class DropZoneItem
      *
      * @return string
      */
-    public function getRelativePathToOriginalFilesDirectory()
+    public function getRelativePathToOriginalFilesDirectory(): string
     {
         return
             $this->dropZoneHomeDirectory
@@ -73,13 +94,26 @@ class DropZoneItem
      *
      * @return string
      */
-    public function getRelativePathToDropZonePreviewFilesDirectory()
+    public function getRelativePathToDropZonePreviewFilesDirectory(): string
     {
         return
             $this->dropZoneHomeDirectory
             . DIRECTORY_SEPARATOR
             . $this->itemIndex
             . $this->dropZoneThumbNail;
+    }
+
+    /**
+     * for Storage::deleteDirectory($this->dropZoneItem->get);
+     *
+     * @return string
+     */
+    public function getRelativePathToDropZoneItemIndexDirectory(): string
+    {
+        return
+            $this->dropZoneHomeDirectory
+            . DIRECTORY_SEPARATOR
+            . $this->itemIndex;
     }
 
     public function isItemIndexExist(): bool
@@ -108,13 +142,15 @@ class DropZoneItem
         $this->relativePathToStorageDropZone = $relativePathToStorageDropZone;
     }
 
+
     /**
-     * @param string $itemOriginal
+     * @param string $itemOriginalPath
      */
     public function setItemOriginal(string $itemOriginalPath): void
     {
         $this->itemOriginalPath = $itemOriginalPath;
     }
+
 
     /**
      * @param string $dropZoneThumbNail
@@ -124,7 +160,28 @@ class DropZoneItem
         $this->dropZoneThumbNail = $dropZoneThumbNail;
     }
 
-    public function __toString()
+    /**
+     * @return string
+     */
+    public function getFileName(): string
+    {
+        return $this->fileName;
+    }
+
+    /**
+     * set file name for uploaded file in site filesystem
+     *
+     * @param null $fileName
+     */
+    public function setFileName($fileName): void
+    {
+        $this->fileName = $fileName;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
     {
         return json_encode([
             'absolutePathToStorage' => $this->absolutePathToStorage,
@@ -133,15 +190,9 @@ class DropZoneItem
             'itemOriginalPath' => $this->itemOriginalPath,
             'dropZoneThumbNail' => $this->dropZoneThumbNail,
             'fileName' => $this->fileName,
-            //'relativePathToStorageDropZone' => $this->relativePathToStorageDropZone,
+            'dropZoneHomeDirectory' => $this->dropZoneHomeDirectory,
         ]);
     }
 
-    /**
-     * @return null
-     */
-    public function getFileName()
-    {
-        return $this->fileName;
-    }
+
 }

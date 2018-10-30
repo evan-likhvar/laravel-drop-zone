@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\DropZoneDeleteItem;
 use App\Repositories\DropZoneItem;
+use App\Repositories\DropZoneStoreItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+
 
 class SingleController extends Controller
 {
@@ -17,24 +18,49 @@ class SingleController extends Controller
 
     public function store(Request $request)
     {
-        //$file = $request->file('file');
 
-        $dropZoneItem = new DropZoneItem('single',$request->file('file')->getClientOriginalName() );
+        //todo validate request file exist
+        //todo add size for preview
+        //
+        try {
+            $dropZoneItem = (new DropZoneStoreItem('single'))->store($request->file('file'));
+        } catch (\Exception $e) {
+            return Response::json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
 
-        $request->file('file')->storeAs(
-            $dropZoneItem->getRelativePathToOriginalFilesDirectory(), $dropZoneItem->getFileName()
-        );
-
-        Storage::makeDirectory($dropZoneItem->getRelativePathToDropZonePreviewFilesDirectory());
-
-        Image::make($dropZoneItem->getFullPathToOriginalFile())
-            ->resize(250, null, function ($constraints) {
-                $constraints->aspectRatio();
-            })
-            ->save($dropZoneItem->getFullPathToDropZonePreviewFile());
+        //todo validate $dropZoneItem
 
         return Response::json([
             'message' => 'Image saved Successfully'
         ], 200);
+    }
+
+    public function delete(Request $request)
+    {
+        //todo validate request file exist
+        //todo add size for preview
+        //
+
+        $dropZoneResponce = (new DropZoneDeleteItem('single'))->delete();
+
+        //todo validate $dropZoneItem
+
+        return Response::json([
+            'message' => 'Image deleted Successfully'
+        ], 200);
+    }
+
+    public function getPreview()
+    {
+        $dropZoneItem = new DropZoneItem('single');
+        try {
+            return $dropZoneItem->getPreviewInfo();
+        } catch (\Exception $e) {
+            return Response::json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

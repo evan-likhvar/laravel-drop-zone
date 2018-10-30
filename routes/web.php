@@ -16,4 +16,13 @@ Route::get('/', function () {
 });
 
 Route::get('/single/blade','SingleController@show')->name('single');
-Route::post('/single/upload','SingleController@store')->name('single-store');
+Route::post('/single/upload','SingleController@store')->name('single.store');
+Route::post('/single/delete','SingleController@delete')->name('single.delete');
+Route::get('/single/get-preview','SingleController@getPreview')->name('single.get-preview');
+
+
+
+
+
+Route::get('/twice/blade','TwiceController@show')->name('twice');
+

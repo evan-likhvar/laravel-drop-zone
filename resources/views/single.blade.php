@@ -14,18 +14,18 @@
 
     <script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
     <link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">
-    <script src="{{ url('/js/dropzone-config.js') }}"></script>
 </head>
 <body>
 
 <div class="container">
-    <form method="post" action="{{ route('single-store') }}"
+    <form method="post" action="{{ route('single.store') }}"
           enctype="multipart/form-data" class="dropzone" id="single-dropzone">
         {{ csrf_field() }}
         <div class="dz-message">
-            <div class="col-xs-8">
+
+                <div class="col-xs-8">
                 <div class="message">
-                    <p>Drop files here or Click to Upload</p>
+                    <p>Поместите файл в эту область.</p>
                 </div>
             </div>
         </div>
@@ -38,6 +38,7 @@
 <div id="preview" style="display: none;">
 
     <div class="dz-preview dz-file-preview">
+        <div id="response-message" style="display: block;text-align: center"></div>
         <div class="dz-image"><img data-dz-thumbnail /></div>
 
         <div class="dz-details">
@@ -68,8 +69,11 @@
                 </g>
             </svg>
         </div>
+
     </div>
 </div>
 {{--End of Dropzone Preview Template--}}
+<script src="{{ url('/js/dropzone-config.js') }}"></script>
+
 </body>
 </html>
