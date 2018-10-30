@@ -27,3 +27,6 @@ Route::post('/twice/delete','TwiceController@delete')->name('twice.delete');
 Route::post('/twice/upload','TwiceController@store')->name('twice.store');
 
 Route::get('/gallery/blade','GalleryController@show')->name('gallery');
+Route::post('/gallery/upload','GalleryController@store')->name('gallery.store');
+Route::post('/gallery/delete','GalleryController@delete')->name('gallery.delete');
+Route::get('/gallery/{id}/{type}/get-preview','GalleryController@getPreview')->name('gallery.get-preview');
