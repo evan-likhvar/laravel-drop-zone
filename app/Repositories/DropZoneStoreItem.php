@@ -48,6 +48,8 @@ class DropZoneStoreItem
 
     private function storeDropZonePreview(): void
     {
+        //todo make correct resize in XY axis
+
         Image::make($this->dropZoneItem->getFullPathToOriginalFile())
             ->resize(null, 175, function ($constraints) {
                 $constraints->aspectRatio();

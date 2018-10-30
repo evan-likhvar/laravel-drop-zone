@@ -50,7 +50,7 @@
             }
 
             .links > a {
-                color: #636b6f;
+                color: #1f6fb2;
                 padding: 0 25px;
                 font-size: 18px;
                 font-weight: 600;
@@ -79,13 +79,13 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    DROPZONE EXAMPLES
+                    DROPZONE AND INTERVENTION IMAGE EXAMPLES
                 </div>
 
                 <div class="links">
                     <a href="{{route('single')}}">Single drop zone</a>
                     <a href="{{route('twice')}}">Two drop zones</a>
-                    <a href="https://laravel-news.com">News</a>
+                    <a href="{{route('gallery')}}">Gallery</a>
 
                 </div>
             </div>
