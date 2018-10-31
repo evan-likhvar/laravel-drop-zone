@@ -20,7 +20,7 @@ class ImageResize
         string $imageFullName,
         string $fullPathToTargetDirectory,
         int $targetWith = 200,
-        int $targetHeight = 100,
+        int $targetHeight = null,
         string $targetImageName = null)
     {
         $this->imageFullName = $imageFullName;
@@ -40,20 +40,28 @@ class ImageResize
         if (!file_exists($this->fullPathToTargetDirectory))
             mkdir($this->fullPathToTargetDirectory, 0755);
 
-        if ($this->resizeDirection())
-            Image::make($this->imageFullName)
-                ->resize(null, $this->targetHeight, function ($constraints) {
-                    $constraints->aspectRatio();
-                })
-                ->crop($this->targetWith, $this->targetHeight)
-                ->save($this->fullPathToTargetDirectory . $this->targetImageName);
-        else
+        if ($this->targetHeight) {
+            if ($this->resizeDirection() && $this->targetHeight)
+                Image::make($this->imageFullName)
+                    ->resize(null, $this->targetHeight, function ($constraints) {
+                        $constraints->aspectRatio();
+                    })
+                    ->crop($this->targetWith, $this->targetHeight)
+                    ->save($this->fullPathToTargetDirectory . $this->targetImageName);
+            else
+                Image::make($this->imageFullName)
+                    ->resize($this->targetWith, null, function ($constraints) {
+                        $constraints->aspectRatio();
+                    })
+                    ->crop($this->targetWith, $this->targetHeight)
+                    ->save($this->fullPathToTargetDirectory . $this->targetImageName);
+        } else {
             Image::make($this->imageFullName)
                 ->resize($this->targetWith, null, function ($constraints) {
                     $constraints->aspectRatio();
                 })
-                ->crop($this->targetWith, $this->targetHeight)
                 ->save($this->fullPathToTargetDirectory . $this->targetImageName);
+        }
     }
 
     private function resizeDirection(): bool

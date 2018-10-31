@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Storage;
 class DropZoneStoreItem
 {
     private $dropZoneItem;
+    private $previewWidth;
+    private $previewHeight;
 
     public function __construct($itemIndex)
     {
@@ -30,15 +32,20 @@ class DropZoneStoreItem
 
         $this->storeOriginalFile($uploadFile);
 
+        return $this->dropZoneItem;
+    }
+
+    public function createPreview()
+    {
+        //dd($this);
+
         Storage::makeDirectory($this->dropZoneItem->getRelativePathToDropZonePreviewFilesDirectory());
 
         (new ImageResize(
             $this->dropZoneItem->getFullPathToOriginalFile(),
             $this->dropZoneItem->getFullPathToDropZonePreviewDirectory(),
-            235,175)
+            $this->previewWidth)
         )->resize();
-
-        return $this->dropZoneItem;
     }
 
     private function storeOriginalFile(UploadedFile $uploadFile): void
@@ -47,5 +54,21 @@ class DropZoneStoreItem
             $this->dropZoneItem->getRelativePathToOriginalFilesDirectory(),
             $this->dropZoneItem->getFileName()
         );
+    }
+
+    /**
+     * @param int $previewWidth
+     */
+    public function setPreviewWidth(int $previewWidth): void
+    {
+        $this->previewWidth = $previewWidth;
+    }
+
+    /**
+     * @param int $previewHeight
+     */
+    public function setPreviewHeight(int $previewHeight): void
+    {
+        $this->previewHeight = $previewHeight;
     }
 }

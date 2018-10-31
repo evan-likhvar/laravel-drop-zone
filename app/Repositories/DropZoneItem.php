@@ -45,7 +45,8 @@ class DropZoneItem
         return [
             'link'=>'/'.$file[0],
             'name'=>$fileInfo->getFilename(),
-            'size'=>$fileInfo->getSize()
+            'size'=>$fileInfo->getSize(),
+            'test'=>320
         ];
     }
 

@@ -86,7 +86,7 @@
                     <a href="{{route('single')}}">Single drop zone</a>
                     <a href="{{route('twice')}}">Two drop zones</a>
                     <a href="{{route('gallery')}}">Gallery</a>
-
+                    <a href="{{route('resizable')}}">Resizeable drop zone</a>
                 </div>
             </div>
         </div>
