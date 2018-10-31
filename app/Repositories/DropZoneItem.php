@@ -61,6 +61,17 @@ class DropZoneItem
             . $this->fileName;
     }
 
+    public function getFullPathToOriginalDirectory(): string
+    {
+        return
+            $this->absolutePathToStorage
+            . $this->relativePathToStorageDropZone
+            . DIRECTORY_SEPARATOR
+            . $this->itemIndex
+            . $this->itemOriginalPath
+            . DIRECTORY_SEPARATOR;
+    }
+
     public function getFullPathToDropZonePreviewFile(): string
     {
         return
@@ -72,7 +83,16 @@ class DropZoneItem
             . DIRECTORY_SEPARATOR
             . $this->fileName;
     }
-
+    public function getFullPathToDropZonePreviewDirectory(): string
+    {
+        return
+            $this->absolutePathToStorage
+            . $this->relativePathToStorageDropZone
+            . DIRECTORY_SEPARATOR
+            . $this->itemIndex
+            . $this->dropZoneThumbNail
+            . DIRECTORY_SEPARATOR;
+    }
     /**
      * for $request->file('file')->storeAs(
      * $dropZoneItem->getDropZoneHomeDirectory(), $request->file('file')->getClientOriginalName()

@@ -5,12 +5,18 @@ namespace App\Http\Controllers;
 use App\Repositories\DropZoneDeleteItem;
 use App\Repositories\DropZoneItem;
 use App\Repositories\DropZoneStoreItem;
+use App\Repositories\ImageResize;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 
 
 class GalleryController extends Controller
 {
+    const IMAGE_GALLERY_SIZE = [
+        '_S' => [230,171],
+        '_XS' => [110,82]
+    ];
+
     public function show()
     {
         return view('gallery');
@@ -33,6 +39,8 @@ class GalleryController extends Controller
         }
 
         //todo validate $dropZoneItem
+
+        $this->createImageGallery($dropZoneItem);
 
         return Response::json([
             'message' => 'Image saved Successfully'
@@ -66,6 +74,23 @@ class GalleryController extends Controller
             return Response::json([
                 'message' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    private function createImageGallery(DropZoneItem $dropZoneItem)
+    {
+        $imageResize = new ImageResize(
+            $dropZoneItem->getFullPathToOriginalFile(),
+            $dropZoneItem->getFullPathToOriginalDirectory().'gallery/'
+        );
+
+        $path_parts = pathinfo($dropZoneItem->getFullPathToOriginalFile());
+
+        foreach(self::IMAGE_GALLERY_SIZE as $size => $dimension) {
+            $imageResize->setTargetWith($dimension[0]);
+            $imageResize->setTargetHeight($dimension[1]);
+            $imageResize->setTargetImageName($path_parts['filename'].$size.'.'.$path_parts['extension']);
+            $imageResize->resize();
         }
     }
 }

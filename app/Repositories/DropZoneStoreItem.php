@@ -11,7 +11,6 @@ namespace App\Repositories;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
 
 class DropZoneStoreItem
 {
@@ -33,7 +32,11 @@ class DropZoneStoreItem
 
         Storage::makeDirectory($this->dropZoneItem->getRelativePathToDropZonePreviewFilesDirectory());
 
-        $this->storeDropZonePreview();
+        (new ImageResize(
+            $this->dropZoneItem->getFullPathToOriginalFile(),
+            $this->dropZoneItem->getFullPathToDropZonePreviewDirectory(),
+            235,175)
+        )->resize();
 
         return $this->dropZoneItem;
     }
@@ -44,17 +47,5 @@ class DropZoneStoreItem
             $this->dropZoneItem->getRelativePathToOriginalFilesDirectory(),
             $this->dropZoneItem->getFileName()
         );
-    }
-
-    private function storeDropZonePreview(): void
-    {
-        //todo make correct resize in XY axis
-
-        Image::make($this->dropZoneItem->getFullPathToOriginalFile())
-            ->resize(null, 175, function ($constraints) {
-                $constraints->aspectRatio();
-            })
-            ->crop(235,175)
-            ->save($this->dropZoneItem->getFullPathToDropZonePreviewFile());
     }
 }

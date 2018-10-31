@@ -1,47 +1,87 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: evan
- * Date: 30.10.18
- * Time: 18:39
- */
 
 namespace App\Repositories;
-
 
 use Intervention\Image\Facades\Image;
 
 class ImageResize
 {
-
     private $imageFullName;
     private $splImage;
     private $image;
 
+    private $fullPathToTargetDirectory;
     private $targetWith;
     private $targetHeight;
-    private $targetDirectory = '/gallery';
 
-    public function __construct(string $imageFullName, int $targetWith, int $targetHeight)
+    private $targetImageName;
+
+    public function __construct(
+        string $imageFullName,
+        string $fullPathToTargetDirectory,
+        int $targetWith = 200,
+        int $targetHeight = 100,
+        string $targetImageName = null)
     {
         $this->imageFullName = $imageFullName;
-        $this->splImage = new \SplFileInfo($imageFullName);
         $this->targetWith = $targetWith;
         $this->targetHeight = $targetHeight;
 
+        $this->splImage = new \SplFileInfo($imageFullName);
+
         $this->image = Image::make($this->imageFullName);
+
+        $this->fullPathToTargetDirectory = $fullPathToTargetDirectory;
+        $this->targetImageName = $targetImageName ? $targetImageName : $this->splImage->getFilename();
+    }
+
+    public function resize()
+    {
+        if (!file_exists($this->fullPathToTargetDirectory))
+            mkdir($this->fullPathToTargetDirectory, 0755);
+
+        if ($this->resizeDirection())
+            Image::make($this->imageFullName)
+                ->resize(null, $this->targetHeight, function ($constraints) {
+                    $constraints->aspectRatio();
+                })
+                ->crop($this->targetWith, $this->targetHeight)
+                ->save($this->fullPathToTargetDirectory . $this->targetImageName);
+        else
+            Image::make($this->imageFullName)
+                ->resize($this->targetWith, null, function ($constraints) {
+                    $constraints->aspectRatio();
+                })
+                ->crop($this->targetWith, $this->targetHeight)
+                ->save($this->fullPathToTargetDirectory . $this->targetImageName);
+    }
+
+    private function resizeDirection(): bool
+    {
+        return $this->image->height() / $this->image->width() > 1 ? false : true;
     }
 
     /**
-     * @param string $targetDirectory
+     * @param int $targetWith
      */
-    public function setTargetDirectory(string $targetDirectory): void
+    public function setTargetWith(int $targetWith): void
     {
-        $this->targetDirectory = $targetDirectory;
+        $this->targetWith = $targetWith;
     }
 
-    private function setOriginalImageSize()
+    /**
+     * @param int $targetHeight
+     */
+    public function setTargetHeight(int $targetHeight): void
     {
+        $this->targetHeight = $targetHeight;
+    }
 
+    /**
+     * @param string $targetImageName
+     */
+    public function setTargetImageName(string $targetImageName): void
+    {
+        $this->targetImageName = $targetImageName;
     }
 }
